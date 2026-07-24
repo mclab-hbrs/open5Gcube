@@ -9,8 +9,13 @@ Library  get_env.py
 *** Variables ***
 # Tunnel interface each UE implementation brings up. These names are fixed by the
 # UE software rather than configurable: see docker/oai/ran-entrypoint.sh and
-# docker/srsran/4g/entrypoint.sh; UERANSIM creates uesimtun0 itself.
+# docker/srsran/4g/entrypoint.sh; UERANSIM creates uesimtun0 itself. PacketRusher is
+# absent here because it derives the name from the MSIN: see Get UE Tunnel Interface.
 &{UE_TUN_IFACE}  oai=oaitun_ue1  ueransim=uesimtun0  srsran=tun_srsue
+
+# Container running the UE. Stacks that combine the gNB and UE in a single container
+# (PacketRusher) override this in their suite.
+${UE_CONTAINER}  ue
 
 # Core-specific assertions. The AMF and SMF log formats differ between the cores,
 # so each core gets its own keyword and CORE_TYPE picks the pair.
@@ -146,13 +151,25 @@ Set Container Versions Metadata
 
 UE Should Reach The Internet
     [Documentation]  Ping 8.8.8.8 from the UE through its tunnel interface.
-    ...    ${ue} names the UE implementation (oai, ueransim, srsran) and defaults to the
-    ...    suite's UE_TYPE; the interface it brings up is looked up in UE_TUN_IFACE.
-    [Arguments]  ${ue}=${UE_TYPE}
-    ${result} =  Run Process  docker  exec  ue  ping  -I  ${UE_TUN_IFACE}[${ue}]  -c  1  8.8.8.8
+    ...    ${ue} names the UE implementation (oai, ueransim, srsran, packetrusher) and
+    ...    defaults to the suite's UE_TYPE; ${container} defaults to the suite's UE_CONTAINER.
+    [Arguments]  ${ue}=${UE_TYPE}  ${container}=${UE_CONTAINER}
+    ${iface} =  Get UE Tunnel Interface  ${ue}
+    ${result} =  Run Process  docker  exec  ${container}  ping  -I  ${iface}  -c  1  8.8.8.8
     Should Be Empty  ${result.stderr}
     Should Be Equal  ${result.rc}  ${0}
     Log  ${result.stdout}
+
+Get UE Tunnel Interface
+    [Documentation]  Name of the tunnel interface the UE brings up. Most implementations use a
+    ...    fixed name (UE_TUN_IFACE), but PacketRusher names one interface per subscriber,
+    ...    derived from the MSIN, e.g. MSIN 0010000001 gives val0010000001.
+    [Arguments]  ${ue}=${UE_TYPE}
+    IF  '${ue}' == 'packetrusher'
+        ${msin} =  Get Env  UE_SOFT_MSIN
+        RETURN  val${msin}
+    END
+    RETURN  ${UE_TUN_IFACE}[${ue}]
 
 UE Should Be Registered At AMF
     [Documentation]  Assert the AMF registered the UE whose IMSI is built from the
@@ -223,7 +240,7 @@ srsEPC Default Bearer Should Be Established
     Container Log Should Match Regexp  epc  Activated EPS Bearer: Bearer id \\d+
 
 Open5GS MME Log Should Show UE Attached
-    [Documentation] Assert the MME completed the attach for the given IMSI.
+    [Documentation]  Assert the MME completed the attach for the given IMSI.
     [Arguments]  ${imsi}
     Container Log Should Match Regexp  mme  \\[${imsi}\\] Attach complete
 
