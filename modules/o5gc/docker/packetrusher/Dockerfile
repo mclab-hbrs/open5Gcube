@@ -9,9 +9,9 @@ ENV PATH="$PATH:/usr/local/go/bin"
 
 WORKDIR /o5gc/PacketRusher
 
-ARG PACKETRUSHER_VERSION=20240521
-RUN git clone --branch ${PACKETRUSHER_VERSION} --depth 1                      \
-        https://github.com/HewlettPackard/PacketRusher .                      \
+ARG PACKETRUSHER_VERSION=5bf8b4e
+RUN git clone https://github.com/HewlettPackard/PacketRusher .                \
+    && git checkout ${PACKETRUSHER_VERSION}                                   \
     && go mod download                                                        \
     && go build cmd/packetrusher.go
 
