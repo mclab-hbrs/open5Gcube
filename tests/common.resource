@@ -18,10 +18,14 @@ Library  get_env.py
 ...                      open5gs=Open5GS SMF Log Should Contain PDU Session Setup
 ...                      free5gc=Free5GC SMF Log Should Contain PDU Session Setup
 ...                      ellacore=Ellacore SMF Log Should Contain PDU Session Setup
+...                      srsepc=srsEPC Default Bearer Should Be Established
+...                      open5gs-epc=Open5GS SMF Log Should Contain Default Bearer
 &{CORE_REGISTRATION_KW}  oai=OAI AMF Log Should Show UE Registered
 ...                      open5gs=Open5GS AMF Log Should Show UE Registered
 ...                      free5gc=Free5GC AMF Log Should Show UE Registered
 ...                      ellacore=Ellacore AMF Log Should Show UE Registered
+...                      srsepc=srsEPC Log Should Show UE Attached
+...                      open5gs-epc=Open5GS MME Log Should Show UE Attached
 
 
 *** Keywords ***
@@ -40,7 +44,7 @@ Startup Should Be Complete
     SMF Log Should Contain PDU Session Setup
 
 Setup Stack
-    [Documentation]  Start the stack (make run-${STACK}) and wait until it is ready.
+    [Documentation]  Start the stack and wait until it is ready.
     ...    Used as Suite Setup; the suite only supplies ${STACK}.
     Log To Console  Setup Stack: run 'make run-${STACK}'
     Start Process  make  run-${STACK}
@@ -51,8 +55,8 @@ Setup Stack
     Wait Until Startup Complete
 
 Teardown Stack
-    [Documentation]  Collect artifacts (best effort) then stop the stack. Runs on
-    ...    every exit, including a failed Suite Setup, so logs survive a bad startup.
+    [Documentation]  Collect artifacts then stop the stack. Runs on every exit,
+    ...   including a failed Suite Setup, so logs survive a bad startup.
     Run Keyword And Warn On Failure  Collect Test Data
     Log To Console  Teardown Stack: run 'make stop-${STACK}'
     Run Process  make  stop-${STACK}
@@ -130,9 +134,6 @@ Container Log Should Match Regexp
 
 Set Container Versions Metadata
     [Documentation]  Record each container's /etc/image_version as suite metadata.
-    ...    Containers without that file (e.g. the mysql/mongo database image) are
-    ...    skipped with a warning rather than failing the whole collection, so the
-    ...    caller can pass the full container list.
     [Arguments]  @{containers}
     FOR  ${container}  IN  @{containers}
         ${result} =  Run Process  docker  exec  ${container}  cat  /etc/image_version
@@ -208,3 +209,24 @@ Ellacore AMF Log Should Show UE Registered
 Ellacore SMF Log Should Contain PDU Session Setup
     Container Log Should Match Regexp  ellacore  "msg":"Allocated IPv4 address","component":"SMF"
     Container Log Should Match Regexp  ellacore  "msg":"Successfully created PDU session context","component":"SMF"
+
+srsEPC Log Should Show UE Attached
+    [Documentation]  Assert the UE with the given IMSI progressed through NAS security to a completed attach.
+    [Arguments]  ${imsi}
+    Container Log Should Match Regexp  epc  Attach request -- IMSI: ${imsi}
+    Container Log Should Match Regexp  epc  Security Mode Command Complete -- IMSI: ${imsi}
+    Container Log Should Match Regexp  epc  UL NAS: Received Attach Complete
+
+srsEPC Default Bearer Should Be Established
+    [Documentation]  Assert the SPGW allocated an address to the UE and the MME activated the bearer.
+    Container Log Should Match Regexp  epc  SPGW Allocated IP \\d+\\.\\d+\\.\\d+\\.\\d+ to IMSI \\d+
+    Container Log Should Match Regexp  epc  Activated EPS Bearer: Bearer id \\d+
+
+Open5GS MME Log Should Show UE Attached
+    [Documentation] Assert the MME completed the attach for the given IMSI.
+    [Arguments]  ${imsi}
+    Container Log Should Match Regexp  mme  \\[${imsi}\\] Attach complete
+
+Open5GS SMF Log Should Contain Default Bearer
+    Container Log Should Match Regexp  smf  \\[Added\\] Number of SMF-Sessions is now
+    Container Log Should Match Regexp  smf  UE IMSI\\[\\d+\\] APN\\[.*\\] IPv4\\[\\d

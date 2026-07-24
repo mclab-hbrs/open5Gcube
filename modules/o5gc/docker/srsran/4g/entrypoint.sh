@@ -33,6 +33,7 @@ add_user () {
 
 case "${srv}" in
     enb | gnb)
+        [[ "${srv}" == "enb" ]] && retry --until=success --times=10 --delay=5 -- ncat -z --sctp ${MME_IP_ADDR} 36412
         envsubst.sh /mnt/srsran/rr_${srv}.conf rr_${srv}.conf
         envsubst.sh /mnt/srsran/rb.conf rb.conf
         envsubst.sh /mnt/srsran/sib.conf sib.conf
@@ -47,6 +48,10 @@ case "${srv}" in
         exec build/srsepc/src/srsepc ${srv}.conf
         ;;
     ue)
+        retry --until=success --times=10 --delay=5 -- sh -c '
+            wait-for-it -t 1 "${ENB_RAN_IP_ADDR}:2000" >/dev/null 2>&1 ||
+            wait-for-it -t 1 "${GNB_RAN_IP_ADDR}:2000" >/dev/null 2>&1'
+        sleep 5
         build/srsue/src/srsue ${srv}.conf &
         srsue_pid=$!
         { set +x; } 2>/dev/null

@@ -29,6 +29,11 @@ services:
     labels:
       o5gc.webui.priority: ${WEBUI_PRIO_CORE_HIGH}
     profiles: [ "core" ]
+    healthcheck:
+      test: ss -lnS | grep -q 36412
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   ran:
     extends:
