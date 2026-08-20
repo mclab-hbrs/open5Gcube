@@ -12,12 +12,10 @@ services:
     image: o5gc/${OPEN5GS_IMAGE:-open5gs:${OPEN5GS_VERSION:-latest}}
     entrypoint: [ "/mnt/open5gs/entrypoint.sh" ]
     init: true
-    privileged: true
     env_file: [ "${ENV_FILE}" ]
     environment:
       - OPEN5GS_USE_HTTP1=${OPEN5GS_USE_HTTP1:-yes}
       - OPEN5GS_LOGLEVEL=${OPEN5GS_LOGLEVEL:-info}
-      - LI_XPDU_DEBUG_TRACE=${CORENET_HOST_IP_ADDR}:12012
     volumes:
       - .:/mnt/open5gs/:ro
       - ${DEVELOP_VOLUME_OPEN5GS:-${BASE}/var/empty:/var/empty}
@@ -310,6 +308,7 @@ services:
       service: base
     container_name: upf
     command: upf
+    privileged: true
     environment:
       - UPF_ADVERTISE_IP=${UPF_IP_ADDR}
       - CAPTURE_INTERFACE=ogstun
