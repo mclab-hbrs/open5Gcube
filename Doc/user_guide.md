@@ -43,7 +43,7 @@ GNB_HOSTNAME=o5gc3
 
 ### ``settings.env``
 Sets especially the 4G / 5G mobile network settings like the PLMN, TAC, APN and the used
-frequencies. These configurations are utilised by all Stacks if not
+frequencies. These configurations are utilized by all Stacks if not
 [configured explicitly](#stack-specific-settings) to different values in the Stack directory.
 
 ```shell title="etc/settings.env"
@@ -70,7 +70,7 @@ this settings to program the corresponding databases of the particular Core Netw
 ```shell title="etc/uedb.env"
 UE_DB+="
 #IMSI           Key                              OPc                              [ADM]
-# add one subscriper per line, like for example
+# add one subscriber per line, like for example
 001010000052100 F18E5DB0A8B5B8A0304E9113D121DFE3 E83C9CF73E3B9E82E48005A696E86AD8
 # optionally with an ADM key as 4th field, like for example
 001010000052101 F18E5DB0A8B5B8A0304E9113D121DFE3 E83C9CF73E3B9E82E48005A696E86AD8 12345678
@@ -81,11 +81,11 @@ An optional 4th field, the **ADM key**, may be appended per line. It is used onl
 
 In addition, each .env file in the optional directory ``etc/uedb.d/`` is included to extend the UE_DB. This can be used to organize the subscriber information in a separate repository.
 
-### ``network.env``
+### ``networks.env``
 The Docker network configuration does not usually need to be changed. The subnet masks and the
 static IP addresses of the containers are configured in this file.
 
-```shell title="etc/network.env"
+```shell title="etc/networks.env"
 # corenet
 CORENET_SUBNET_ADDR=192.168.70.0
 CORENET_SUBNET_SUFFIX=24
@@ -150,7 +150,7 @@ to start just the core of the Stack, and
 ```console
 make run-oairan-open5gs-5g-gnb
 ```
-to start the gnB.
+to start the gNB.
 
 ![ctop](img/ctop.png){ align=right width=40% }
 To get a better overview of the running containers on the Controller host,

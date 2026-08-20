@@ -4,7 +4,7 @@ The network architecture incorporates three virtual Docker networks:
 * ``corenet`` (192.168.70.0/24): Configured as a *[macvlan](https://docs.docker.com/network/drivers/macvlan/)*
   this network is designated for all Core Network and RAN components. The use of 802.1q trunk
   bridge mode allows a flexible distribution of containers across multiple servers.
-  The host system is configured with an additional virtual interfaces, facilitating direct
+  The host system is configured with additional virtual interfaces, facilitating direct
   communication with services within the network.
 * ``extnet`` (192.168.10.0/24): Bridged to the WAN, this network facilitates the Core Network
   Gateway (SPGWU) and other services (like DNS) for external connectivity through the host
@@ -17,15 +17,15 @@ All services of the [Stacks](stacks.md) are executed always in isolated Docker c
 This ensures the reproducibility of the Stacks and allows to describe the building and running
 environment in code and configuration files.
 
-The structure, parameters and dependencies of the services in a Stack are organised using
+The structure, parameters and dependencies of the services in a Stack are organized using
 [Docker Compose](https://docs.docker.com/compose/). While Docker Compose is a great and simple
-to use tool to operate multi-container scenarios on a single host, it doesn't has features to
+to use tool to operate multi-container scenarios on a single host, it doesn't have features to
 manage containers across multiple hosts. This is where typically
 [Docker Swarm](https://docs.docker.com/engine/swarm/) or [Kubernetes](https://kubernetes.io/)
 enter the stage. However, Kubernetes is quite complex and comes with a lot of overhead and
 Docker Swarm doesn't support static IP assignment to the containers.
 
-Therefore, the *open5Gcube* uses a unsophisticated script-based approach to run containers
+Therefore, the *open5Gcube* uses an unsophisticated script-based approach to run containers
 on remote hosts. To make the setup as simple as possible, one server is selected as so called
 **Controller Host** (``o5gc1``). On this machine, the project repository is installed. It
 runs all Stack services (especially the core network) except the RAN software. This is delegated
@@ -60,7 +60,7 @@ the building of the actual images by incorporating the following features:
   during image building.
 * ``git-cache-http-server``: This element caches git repositories, enhancing efficiency by
   avoiding repeated fetches.
-``Downloads``: Large downloaded files are cached to accelerate subsequent builds.
+* ``Downloads``: Large downloaded files are cached to accelerate subsequent builds.
 
 The cacher runs on the Controller host only. To make it available for the builds on the RAN
 hosts, the cacher ports have to be forwarded over ssh, see
@@ -78,7 +78,7 @@ to reflect the project version, such as ``o5gc/oai-amf:1.4.0``. The ``latest`` t
 to the most recently built version, creating a convenient reference, like ``o5gc/oai-amf:latest``
 pointing to ``o5gc/oai-amf:1.4.0``.
 
-While the images are not optimized for size, they closely follow to the structure of the official
+While the images are not optimized for size, they closely follow the structure of the official
 images associated with their respective projects as far as sensible. Almost all images are built
 on a common base image ``o5gc-base``. This approach ensures consistency and incorporates
 essential configurations to leverage the build-cacher. Moreover, the ``o5gc-base`` image

@@ -7,7 +7,7 @@ carrier frequencies.
 2. Press F6 in the bios to switch to extended mode.
 3. Deactivate the functions under the following tabs:
     1. Enhanced -> CPU Configuration -> Hyperthreading Disabled
-    2. Enhanced -> CPU Configuration -> C-State Disabled OC-Tweakere
+    2. Enhanced -> CPU Configuration -> C-State Disabled OC-Tweaker
        -> CPU Configuration -> Intel-SpeedStep Disabled
     3. System Start -> Full Screen Logo Disabled
 
@@ -56,7 +56,7 @@ cd open5Gcube
 ### Install Docker Engine
 See [official Docker documentation](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository)
 for details. Specific fixed versions of the Docker packages are installed with the script
-``docker/o5gc/install-docker.sh``. Execute it with
+``modules/base/docker/o5gc/install-docker.sh``. Execute it with
 ```console
 make system-install-docker
 ```
@@ -168,7 +168,7 @@ CORENET_MACVLAN_IFACE=eno1
 ```
 3. Set the ``USRP_IFACE`` to the interface name of the 10G adapter connected to the USRP X310
 on the RAN hosts. Leave it unchanged if USRPs B210 via USB are used.
-4. Configure the hostname of the enb and gnb ran hosts:
+4. Configure the hostname of the eNB and gNB RAN hosts:
 ```shell
 # eNB / gNB RAN hostnames
 ENB_HOSTNAME=o5gc2

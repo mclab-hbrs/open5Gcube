@@ -24,7 +24,7 @@ open5Gcube facilitates reproducible experiments across a variety of mobile netwo
 
 ### Features
 
-- Full-stack mobile network simulation (2G/4G/5G, NSA/SA)
+- Full-stack mobile network simulation (2G/4G/5G SA)
 - Integration with:
   - **Open5GS**, **OpenAirInterface**, **UERANSIM**, **srsRAN**, **osmocom**, and more
 - Easy-to-use **WebUI**
@@ -98,7 +98,7 @@ CORENET_DRIVER=bridge
 CORENET_MACVLAN_IFACE=eno1
 ```
 3. Set the ``USRP_IFACE`` to the interface name of the 10G adapter connected to the USRP X310 on the RAN hosts. Leave it unchanged if USRPs B210 via USB are used.
-4. Configure the hostname of the enb and gnb ran hosts:
+4. Configure the hostname of the eNB and gNB RAN hosts:
 ```shell
 # eNB / gNB RAN hostnames
 ENB_HOSTNAME=localhost
@@ -106,7 +106,7 @@ GNB_HOSTNAME=localhost
 ```
 
 ### ``settings.env``
-Sets especially the 4G / 5G mobile network settings like the PLMN, TAC, APN and the used frequencies. These configurations are utilised by all Stacks if not [configured explicitly](#stack-specific-settings) to different values in the Stack directory.
+Sets especially the 4G / 5G mobile network settings like the PLMN, TAC, APN and the used frequencies. These configurations are utilized by all Stacks if not [configured explicitly](#stack-specific-settings) to different values in the Stack directory.
 
 ```shell
 # Mobile Network
@@ -130,7 +130,7 @@ This file contains the *database* for all SIM Cards, including the IMSI, Key and
 ```shell
 UE_DB+="
 #IMSI           Key                              OPc                              [ADM]
-# add one subscriper per line, like for example
+# add one subscriber per line, like for example
 001010000052100 F18E5DB0A8B5B8A0304E9113D121DFE3 E83C9CF73E3B9E82E48005A696E86AD8
 # optionally with an ADM key as 4th field, like for example
 001010000052101 F18E5DB0A8B5B8A0304E9113D121DFE3 E83C9CF73E3B9E82E48005A696E86AD8 12345678
@@ -186,7 +186,7 @@ to start just the core of the Stack, and
 ```console
 make run-oairan-open5gs-5g-gnb
 ```
-to start the gnB.
+to start the gNB.
 
 <img src="Doc/img/ctop.png" width="40%" align="right">
 
